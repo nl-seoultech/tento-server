@@ -39,14 +39,14 @@ def test_get_user_name(f_user):
 
     property는 이런식으로 사용할수있습니다.
 
-      .. sourcecode::python
+    .. sourcecode::python
 
-         class User(Base):
+       class User(Base):
 
-             ...
+           ...
 
-             @property
-             def name(self):
-                 ...
+           @property
+           def name(self):
+               ...
     """
     pass
