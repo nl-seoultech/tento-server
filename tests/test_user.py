@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from bcrypt import hashpw
+
 from tento.user import User
 
 
@@ -18,13 +20,18 @@ def test_create_user(f_session):
     assert email == user[0].email
     # password는 해쉬해서 저장해야하므로 같으면안됩니다
     assert password != user[0].password
+    assert hasattr(user[0], 'created_at')
+    assert hashpw(password, user[0].password) == user[0].password
 
 
 def test_cannot_create_duplicate_user(f_user, f_session):
     """ `tento.user.User`는 `email`이 같은 사용자가 추가되면안됩니다.
     `f_user`는 `tests.conftest` 에 정의되어있습니다.
     """
-    pass
+    email = 'mytest@test.com'
+    other_user = User(email=email, password='helloworld')
+    f_session.add(other_user)
+    f_session.commit()
 
 
 def test_confirm_user_password(f_user, f_session):
