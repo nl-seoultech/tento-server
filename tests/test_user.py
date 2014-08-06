@@ -61,4 +61,4 @@ def test_get_user_name(f_user):
            def name(self):
                ...
     """
-    pass
+    assert 'mytest' == f_user.name

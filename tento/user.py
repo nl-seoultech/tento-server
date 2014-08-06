@@ -28,3 +28,9 @@ class User(Base):
 
     def confirm_password(self, password):
         return hashpw(password, self.password) == self.password
+
+
+    @property
+    def name(self):
+        name, domain = self.email.split('@')
+        return name
