@@ -40,7 +40,9 @@ def test_cannot_create_duplicate_user(f_user, f_session):
 def test_confirm_user_password(f_user, f_session):
     """ `tento.user.User`는 패스워드를 확인할수있는 메소드를 구현해야합니다.
     """
-    pass
+    password = 'mytest:password'
+    assert f_user.confirm_password(password)
+    assert not f_user.confirm_password('not password')
 
 
 def test_get_user_name(f_user):

@@ -24,3 +24,7 @@ class User(Base):
     def __init__(self, email, password, created_at=None):
         hashed = hashpw(password, gensalt())
         super(User, self).__init__(email=email, password=hashed, created_at=created_at)
+
+
+    def confirm_password(self, password):
+        return hashpw(password, self.password) == self.password
