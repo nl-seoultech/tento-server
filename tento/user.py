@@ -15,7 +15,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
 
-    email = Column(Unicode, nullable=False)
+    email = Column(Unicode, nullable=False, unique=True)
 
     password = Column(Unicode, nullable=False)
 

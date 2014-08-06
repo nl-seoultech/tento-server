@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from bcrypt import hashpw
+from pytest import raises
+from sqlalchemy.exc import IntegrityError
 
 from tento.user import User
 
@@ -31,7 +33,8 @@ def test_cannot_create_duplicate_user(f_user, f_session):
     email = 'mytest@test.com'
     other_user = User(email=email, password='helloworld')
     f_session.add(other_user)
-    f_session.commit()
+    with raises(IntegrityError):
+        f_session.commit()
 
 
 def test_confirm_user_password(f_user, f_session):
