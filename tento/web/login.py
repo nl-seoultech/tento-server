@@ -2,13 +2,14 @@
 import arrow
 
 from flask import Blueprint, jsonify, request, abort
-from itsdangerous import JSONWebSignatureSerializer
 from sqlalchemy.exc import IntegrityError
 
-from tento.db import session
-from tento.user import User
+from ..db import session
+from ..user import User
+from .auth import generate_token
 
 bp = Blueprint('login', __name__)
+
 
 @bp.route('/', methods=['POST'])
 def login():
@@ -23,12 +24,6 @@ def login():
         abort(404)
     if not user[0].confirm_password(password):
         abort(404)
-    resp = {
-        'user': {'id': user[0].id,
-                 'email': user[0].email,
-                 'name': user[0].name},
-        'expired_at': arrow.utcnow().replace(hours=+2).timestamp
-    }
-    secret_key = 'secret_key'
-    s = JSONWebSignatureSerializer(secret_key)
-    return jsonify(token=s.dumps(resp).decode('utf-8'), **resp)
+    u = {'id': user[0].id, 'email': user[0].email, 'name': user[0].name}
+    token, resp = generate_token(u)
+    return jsonify(token=token, **resp)
