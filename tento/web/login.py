@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+""" :mod:`tento.web.user` --- tento의 login API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
 import arrow
 
 from flask import Blueprint, jsonify, request, abort

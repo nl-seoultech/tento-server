@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+""" :mod:`tento.web.user` --- tento의 user API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
 from flask import Blueprint, jsonify, request, abort, g
 from sqlalchemy.exc import IntegrityError
 

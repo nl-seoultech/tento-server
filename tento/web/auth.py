@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+""" :mod:`tento.web.auth` --- tento의 인증 모듈
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
 from functools import wraps
 
 from arrow import utcnow, Arrow

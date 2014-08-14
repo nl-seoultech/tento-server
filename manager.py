@@ -27,7 +27,7 @@ def manager(config=None):
 def revision(message):
     """Add a revision"""
     engine = get_engine()
-    config, _ = get_alembic_config(engine)
+    config = get_alembic_config(engine)
     m = "--autogenerate"
     alembic_revision(config,
                      message=message,
@@ -38,7 +38,7 @@ def revision(message):
 def upgrade(revision):
     """Upgrade a revision to --revision or newest revision"""
     engine = get_engine()
-    config, _ = get_alembic_config(engine)
+    config = get_alembic_config(engine)
     alembic_upgrade(config, revision)
 
 
@@ -46,7 +46,7 @@ def upgrade(revision):
 def downgrade(revision):
     """Downgrade a revision to --revision"""
     engine = get_engine()
-    config, _ = get_alembic_config(engine)
+    config = get_alembic_config(engine)
     alembic_downgrade(config, revision)
 
 
@@ -54,7 +54,7 @@ def downgrade(revision):
 def history():
     """List of revision history."""
     engine = get_engine()
-    config, _ = get_alembic_config(engine)
+    config = get_alembic_config(engine)
     return alembic_history(config)
 
 
@@ -62,7 +62,7 @@ def history():
 def branches():
     """Show current un-spliced branch point."""
     engine = get_engine()
-    config, _ = get_alembic_config(engine)
+    config = get_alembic_config(engine)
     return alembic_branch(config)
 
 
@@ -70,7 +70,7 @@ def branches():
 def current():
     """Current revision."""
     engine = get_engine()
-    config, _ = get_alembic_config(engine)
+    config = get_alembic_config(engine)
     return alembic_current(config)
 
 
