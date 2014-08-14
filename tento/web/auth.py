@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
+from functools import wraps
+
 from arrow import utcnow, Arrow
+from flask import g, request, abort
 from itsdangerous import JSONWebSignatureSerializer, BadSignature
+
+from ..db import session
+from ..user import User
 
 
 def get_secret_key():
@@ -34,6 +40,36 @@ def validate_token(token):
     if expired_at < now:
         raise ExpiredTokenError('만료된 token입니다.')
     return data
+
+
+def authorized_user(token):
+    d = validate_token(token)
+    user_id = d['user']['id']
+    u = session.query(User)\
+        .filter(User.id == user_id)\
+        .all()
+    if not u:
+        return None
+    return u[0]
+
+
+def auth_required(f):
+    @wraps(f)
+    def deco(*args, **kwargs):
+        token = request.args.get('token', None) or request.headers.get('Authorization')
+        try:
+            u = authorized_user(token)
+        except TypeError as e:
+            abort(400)
+        except InvalidTokenError as e:
+            abort(400)
+        except ExpiredTokenError as e:
+            abort(400)
+        if u is None:
+            abort(403)
+        g.current_user = u
+        return f(*args, **kwargs)
+    return deco
 
 
 class InvalidTokenError(Exception):
