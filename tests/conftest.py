@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from tento.web.app import app
 from tento.db import get_session, Base, get_engine
 from tento.user import User
+from tento.music import Artist, Album, Genre, Music
 
 
 @fixture
@@ -35,3 +36,48 @@ def f_user(f_session):
     f_session.add(u)
     f_session.commit()
     return u
+
+
+@fixture
+def f_genre(f_session):
+    name = 'pop'
+    genre = Genre(name=name)
+    f_session.add(genre)
+    f_session.commit()
+    return genre
+
+
+@fixture
+def f_artist(f_session):
+    name = 'Adele'
+    artist = Artist(name=name)
+    f_session.add(artist)
+    f_session.commit()
+    return artist
+
+
+@fixture
+def f_album(f_session, f_artist):
+    name = '21'
+    year = 2008
+    album = Album(name=name,
+                  artist=f_artist,
+                  year=year)
+    f_session.add(album)
+    f_session.commit()
+    return album
+
+
+@fixture
+def f_music(f_session, f_genre):
+    name = 'Someone Like You'
+    track_number = 1
+    disk_number = 1
+    music = Music(name=name,
+                  album=f_album,
+                  genre=f_genre,
+                  track_number=track_number,
+                  disk_number=disk_number)
+    f_session.add(music)
+    f_session.commit()
+    return music

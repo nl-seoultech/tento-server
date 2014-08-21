@@ -3,7 +3,7 @@ from tento.music import Artist, Album, Genre, Music
 
 
 def test_create_artist(f_session):
-    name = 'adele'
+    name = 'Adele'
     artist = Artist(name=name)
     f_session.add(artist)
     f_session.commit()
@@ -11,28 +11,30 @@ def test_create_artist(f_session):
             .filter(Artist.name == name)\
             .all()
     assert artist
+    assert artist[0].created_at
     assert name == artist[0].name
 
 
-def test_create_album(f_session):
+def test_create_album(f_session, f_artist):
     name = '21'
-    artist_id = 1
-    genre_id = 1
     year = 2008
     album = Album(name=name,
-                  artist_id=artist_id,
-                  genre_id=genre_id,
+                  artist_id=f_artist.id,
                   year=year)
     f_session.add(album)
     f_session.commit()
     album = f_session.query(Album)\
+            .join(Album.artist)\
             .filter(Album.name == name)\
-            .all()
+            .first()
     assert album
-    assert name == album[0].name
-    assert artist_id == album[0].artist_id
-    assert genre_id == album[0].genre_id
-    assert year == album[0].year
+    assert album.created_at
+    assert name == album.name
+    assert f_artist.id == album.artist_id
+    assert year == album.year
+    assert f_artist.id == album.artist.id
+    assert f_artist.name == album.artist.name
+    assert f_artist.created_at == album.artist.created_at
 
 
 def test_create_genre(f_session):
@@ -44,25 +46,30 @@ def test_create_genre(f_session):
             .filter(Genre.name == name)\
             .all()
     assert genre
+    assert genre[0].created_at
     assert name == genre[0].name
 
 
-def test_create_music(f_session):
+def test_create_music(f_session, f_album, f_genre):
     name = 'Someone Like You'
-    album_id = 1
     track_number = 1
     disk_number = 1
     music = Music(name=name,
-                  album_id=album_id,
+                  album=f_album,
+                  genre=f_genre,
                   track_number=track_number,
                   disk_number=disk_number)
     f_session.add(music)
     f_session.commit()
     music = f_session.query(Music)\
             .filter(Music.name == name)\
-            .all()
+            .first()
     assert music
-    assert name == music[0].name
-    assert album_id == music[0].album_id
-    assert track_number == music[0].track_number
-    assert disk_number == music[0].disk_number
+    assert music.created_at
+    assert name == music.name
+    assert f_album.id == music.album_id
+    assert track_number == music.track_number
+    assert disk_number == music.disk_number
+    assert f_album.id == music.album.id
+    assert f_album.name == music.album.name
+    assert f_genre.name == music.genre.name

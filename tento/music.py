@@ -17,7 +17,6 @@ class Artist(Base):
     """ 가수 정보를 저장하는 스키마
     """
     __tablename__ = 'artists'
-    # sphinx domain
 
     #: :py:class:`Artist` 의 고유키
     id = Column(Integer, primary_key=True)
@@ -28,8 +27,8 @@ class Artist(Base):
     #: 가수에 관한 데이터가 생성된 시각
     created_at = Column(DateTime, default=datetime.now())
 
-    #: relationship 설정
-    album_rel = relationship('Album')
+    #: 이 가수에 속한 :py:class:`Album` 들
+    albums = relationship('Album', backref='artist')
 
 
 class Album(Base):
@@ -37,7 +36,7 @@ class Album(Base):
     """
     __tablename__ = 'albums'
 
-    #: :py:class:'Album' 의 고유키
+    #: :py:class:`Album` 의 고유키
     id = Column(Integer, primary_key=True)
 
     #: 앨범 이름
@@ -46,17 +45,14 @@ class Album(Base):
     #: 가수 이름 정보
     artist_id = Column(Integer, ForeignKey('artists.id'), nullable=False)
 
-    #: 앨범 장르 정보(생략 가능)
-    genre_id = Column(Integer, ForeignKey('genres.id'))
-
     #: 앨범이 출시된 연도
     year = Column(Integer)
 
     #: 생성일
     created_at = Column(DateTime, default=datetime.now())
 
-    #: relationship 설정
-    music_rel = relationship('Music')
+    #: 이 앨범에 속한 :py:class:`Music` 들
+    musics = relationship('Music', backref='album')
 
 
 class Genre(Base):
@@ -64,7 +60,7 @@ class Genre(Base):
     """
     __tablename__ = 'genres'
 
-    #: :py:class:'Genre' 의 고유키
+    #: :py:class:`Genre` 의 고유키
     id = Column(Integer, primary_key=True)
 
     #: 장르 이름
@@ -73,16 +69,13 @@ class Genre(Base):
     #: 생성일
     created_at = Column(DateTime, default=datetime.now())
 
-    #: relationship 설정
-    album_rel = relationship('Album')
-
 
 class Music(Base):
     """ 음악의 제목과 가수등의 정보를 저장하는 스키마
     """
     __tablename__ = 'musics'
 
-    #: py:class:'Music' 의 고유키
+    #: :py:class:`Music` 의 고유키
     id = Column(Integer, primary_key=True)
 
     #: 음악의 이름
@@ -96,6 +89,12 @@ class Music(Base):
 
     #: 앨범 디스크 번호(생략가능)
     disk_number = Column(Integer)
+
+    #: 장르 정보(생략 가능)
+    genre_id = Column(Integer, ForeignKey('genres.id'))
+
+    #: 노래의 장르
+    genre = relationship('Genre')
 
     #: 생성일
     created_at = Column(DateTime, default=datetime.now())
