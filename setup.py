@@ -2,6 +2,14 @@
 from setuptools import setup, find_packages
 
 
+docs_require = [
+    'sphinx>=1.2', 'sphinxcontrib-httpdomain', 'sphinx_rtd_theme'
+]
+
+test_require = [
+    'pytest==2.6.0',
+]
+
 setup(name='tento',
       version='0.0.1',
       author='Kang Hyojun',
@@ -9,7 +17,12 @@ setup(name='tento',
       packages=find_packages(),
       install_requires=[
           'flask==0.10.1', 'flask-script==2.0.5', 'sqlalchemy==0.9.7',
-          'pytest==2.6.0', 'alembic', 'py-bcrypt==0.4', 'arrow',
-          'itsdangerous', 'sphinx==1.2.2', 'sphinx_rtd_theme'
+          'alembic', 'py-bcrypt==0.4', 'arrow',
+          'itsdangerous'
       ],
+      tests_require=test_require,
+      extras_require={
+          'docs': docs_require,
+          'tests': test_require
+      },
       scripts=['manager.py'])

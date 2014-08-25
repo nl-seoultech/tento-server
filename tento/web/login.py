@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" :mod:`tento.web.user` --- tento의 login API
+""" :mod:`tento.web.login` --- tento의 login API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """

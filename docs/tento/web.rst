@@ -8,3 +8,4 @@
       web/auth
       web/user
       web/login
+      web/music

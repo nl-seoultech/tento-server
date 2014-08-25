@@ -6,4 +6,5 @@
 
       tento/db
       tento/user
+      tento/music
       tento/web

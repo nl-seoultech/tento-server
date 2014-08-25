@@ -1,0 +1,3 @@
+
+.. automodule:: tento.music
+   :members:

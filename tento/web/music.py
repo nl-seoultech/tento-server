@@ -16,7 +16,7 @@ def create():
     """ 음악 데이터를 받아서 :class:`tento.music.Artist`,
     :class:`tento.music.Album`, :class:`tento.music.Music` 을 생성합니다.
 
-    .. sourcode:: http
+    .. sourcecode:: http
 
        POST /musics/ HTTP/1.1
        Content-Type: application/json
@@ -33,13 +33,16 @@ def create():
          "genre": "팝 > 팝, 팝 > 발라드"
 
 
-    .. sourcode:: http
+    .. sourcecode:: http
 
-       HTTP/1.1 /musics/ 201 created
+       HTTP/1.1 201 created
        Content-Type: application/json
 
-    :return: 생성된 :class:`tento.music.Artist`, :class:`tento.music.Album`,
-             :class:`tento.music.Music` 를 json으로 반환.
+    :return: 생성된 :py:class:`tento.music.Artist` , :class:`tento.music.Album` ,
+             :py:class:`tento.music.Music` 를 json으로 반환.
+    :statuscode 201: 데이터가 정상적으로 생성됬음.
+    :statuscode 400: 필요한 데이터가 비어있음.
+    :statuscode 500: 서버 에러발생
     """
     if not request.json:
         abort(400)
