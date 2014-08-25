@@ -31,12 +31,15 @@ def create():
          "album_name": "유감",
          "album_release_year": 2010,
          "genre": "팝 > 팝, 팝 > 발라드"
-       
+
 
     .. sourcode:: http
 
        HTTP/1.1 /musics/ 201 created
        Content-Type: application/json
+
+    :return: 생성된 :class:`tento.music.Artist`, :class:`tento.music.Album`,
+             :class:`tento.music.Music` 를 json으로 반환.
     """
     if not request.json:
         abort(400)
@@ -48,18 +51,22 @@ def create():
     album_name = request.json.get('album_name', None)
     album_release_year = request.json.get('album_release_year', None)
     genre = request.json.get('genre', None)
-    if artist_name is None:
+    if artist_name is None or music_name is None or album_name is None:
         abort(400)
     # artist, album, genre, music 순으로 데이터 생성
     artist = Artist(name=artist_name)
     session.add(artist)
     album = Album(artist=artist, name=album_name, year=album_release_year)
     session.add(album)
-    genre = Genre(name=genre)
-    session.add(genre)
-    music = Music(album=album, genre=genre, name=music_name,
+    g = None
+    if genre is not None:
+        g = Genre(name=genre)
+        session.add(g)
+    music = Music(album=album, name=music_name,
                   track_number=music_track_number,
                   disc_number=music_disc_number)
+    if g is not None:
+        music.genre = g
     session.add(music)
     # session.commit()으로 데이터를 DB에 생성하고, 예외처리 실행
     try:

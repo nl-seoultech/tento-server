@@ -16,7 +16,6 @@ def test_web_no_json_create_music(f_session):
     assert 400 == response.status_code
 
 
-
 def test_web_create_music(f_session):
     payload = {
         'music_name': '유감',
@@ -49,6 +48,8 @@ def test_web_create_music(f_session):
     assert album.name
     assert album.created_at
     assert album.year
+    assert album.artist_id
+    assert artist.id == album.artist.id
     # genre 데이터 생성 확인
     genre = f_session.query(Genre)\
             .filter(Genre.name == payload['genre'])\
@@ -64,3 +65,6 @@ def test_web_create_music(f_session):
     assert music.name == payload['music_name']
     assert music.created_at
     assert music.album_id
+    assert album.id == music.album.id
+    assert music.genre_id
+    assert genre.id == music.genre.id
