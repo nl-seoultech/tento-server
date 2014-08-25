@@ -19,7 +19,7 @@ setup(name='tento',
           'flask==0.10.1', 'flask-script==2.0.5', 'sqlalchemy==0.9.7',
           'alembic', 'py-bcrypt==0.4', 'arrow',
           'itsdangerous'
-      ],
+      ] + docs_require,
       tests_require=test_require,
       extras_require={
           'docs': docs_require,
