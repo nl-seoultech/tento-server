@@ -88,7 +88,7 @@ class Music(Base):
     track_number = Column(Integer)
 
     #: 앨범 디스크 번호(생략가능)
-    disk_number = Column(Integer)
+    disc_number = Column(Integer)
 
     #: 장르 정보(생략 가능)
     genre_id = Column(Integer, ForeignKey('genres.id'))

@@ -53,12 +53,12 @@ def test_create_genre(f_session):
 def test_create_music(f_session, f_album, f_genre):
     name = 'Someone Like You'
     track_number = 1
-    disk_number = 1
+    disc_number = 1
     music = Music(name=name,
                   album=f_album,
                   genre=f_genre,
                   track_number=track_number,
-                  disk_number=disk_number)
+                  disc_number=disc_number)
     f_session.add(music)
     f_session.commit()
     music = f_session.query(Music)\
@@ -69,7 +69,7 @@ def test_create_music(f_session, f_album, f_genre):
     assert name == music.name
     assert f_album.id == music.album_id
     assert track_number == music.track_number
-    assert disk_number == music.disk_number
+    assert disc_number == music.disc_number
     assert f_album.id == music.album.id
     assert f_album.name == music.album.name
     assert f_genre.name == music.genre.name
