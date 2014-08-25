@@ -17,5 +17,5 @@ ALEMBIC_SCRIPT_LOCATION = '/Users/admire/src/tento-server/tento/migrations/'
     Fd+zVocBpai7+EunMzSdPU7zxNToE0zIySWWYhN5vZ8=
 
 복사해서 사용하시면됩니다.
-""""
+"""
 SECRET_KEY = 'your secret key'
