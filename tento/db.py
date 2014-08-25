@@ -33,7 +33,7 @@ def get_alembic_config(engine):
                                current_app.config['ALEMBIC_SCRIPT_LOCATION'])
         config.set_main_option('sqlalchemy.url', url)
         config.set_main_option('url', url)
-        return config, ScriptDirectory.from_config(config)
+        return config
     else:
         raise 'no engine founded. DATABASE_URL can be misconfigured.'
 
