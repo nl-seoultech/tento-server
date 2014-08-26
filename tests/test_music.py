@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tento.music import Artist, Album, Genre, Music
+from tento.music import Artist, Album, Genre, Music, Position
 
 
 def test_create_artist(f_session):
@@ -73,3 +73,13 @@ def test_create_music(f_session, f_album, f_genre):
     assert f_album.id == music.album.id
     assert f_album.name == music.album.name
     assert f_genre.name == music.genre.name
+
+def test_create_position(f_session, f_music):
+    music_id = 1
+    position = Position(x=10, y=9, music_id=music_id)
+    f_session.add(position)
+    f_session.commit()
+    position = f_session.query(Position)\
+               .filter(Position.music_id == f_music.music_id)\
+               .first()
+    assert position

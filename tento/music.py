@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer, Unicode, DateTime
+from sqlalchemy.types import Integer, Unicode, DateTime, Float
 
 from .db import Base
 
@@ -96,5 +96,24 @@ class Music(Base):
     #: 노래의 장르
     genre = relationship('Genre')
 
+    position = relationship('Position')
+
     #: 생성일
     created_at = Column(DateTime, default=datetime.now())
+
+class Position(Base):
+    """ 음악 분위기 데이터의 :attr:`x`, `y`, `music_id` 정보를 저장하는 스키마
+    """
+    __tablename__ = 'positions'
+
+    #: :py:class:`Position` 의 고유키
+    id = Column(Integer, primary_key=True)
+
+    #: 분위기의 x 좌표(가사에 의한 분위기)
+    x = Column(Float, nullable=False, default=0)
+
+    #: 분위기의 y 좌표(BPM에 의한 분위기)
+    y = Column(Float, nullable=False, default=0)
+
+    #: :class:`tento.Music.music_id` 를 가리키는 외래키
+    music_id = Column(Integer, ForeignKey('musics.id'), nullable=False)

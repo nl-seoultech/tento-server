@@ -72,12 +72,12 @@ def f_album(f_session, f_artist):
 def f_music(f_session, f_genre):
     name = 'Someone Like You'
     track_number = 1
-    disk_number = 1
+    disc_number = 1
     music = Music(name=name,
                   album=f_album,
                   genre=f_genre,
                   track_number=track_number,
-                  disk_number=disk_number)
+                  disc_number=disc_number)
     f_session.add(music)
     f_session.commit()
     return music
