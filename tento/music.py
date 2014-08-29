@@ -117,3 +117,6 @@ class Position(Base):
 
     #: :class:`tento.Music.music_id` 를 가리키는 외래키
     music_id = Column(Integer, ForeignKey('musics.id'), nullable=False)
+
+    #: 생성일
+    created_at = Column(DateTime, default=datetime.now())

@@ -80,6 +80,10 @@ def test_create_position(f_session, f_music):
     f_session.add(position)
     f_session.commit()
     position = f_session.query(Position)\
-               .filter(Position.music_id == f_music.music_id)\
+               .filter(Position.id == f_music.id)\
                .first()
     assert position
+    assert position.created_at
+    assert 10 == position.x
+    assert 9 == position.y
+    assert music_id == position.music_id

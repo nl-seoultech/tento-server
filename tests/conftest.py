@@ -69,7 +69,7 @@ def f_album(f_session, f_artist):
 
 
 @fixture
-def f_music(f_session, f_genre):
+def f_music(f_session, f_genre, f_album):
     name = 'Someone Like You'
     track_number = 1
     disc_number = 1
