@@ -74,7 +74,7 @@ def test_web_no_json_create_position(f_session):
     """ json으로 position(음악의 좌표 데이터)를 생성
     """
     with app.test_client() as client:
-        response = client.post(url_for('music.create_position'),
+        response = client.post(url_for('music.position'),
                                content_type='application/json')
     assert 400 == response.status_code
 
