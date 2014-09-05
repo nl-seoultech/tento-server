@@ -2,7 +2,7 @@
 from flask import json
 
 from tento.web.app import app
-from tento.music import Artist, Album, Music, Genre
+from tento.music import Artist, Album, Music, Genre, Position
 
 from ..util import url_for
 
@@ -68,3 +68,53 @@ def test_web_create_music(f_session):
     assert album.id == music.album.id
     assert music.genre_id
     assert genre.id == music.genre.id
+
+
+def test_web_no_json_create_position(f_session):
+    """ json으로 position(음악의 좌표 데이터)를 생성
+    """
+    with app.test_client() as client:
+        response = client.post(url_for('music.create_position'),
+                               content_type='application/json')
+    assert 400 == response.status_code
+
+
+def test_web_create_position(f_session):
+    payload = {
+            'music_name': 'Someone Like You',
+            'music_track_number': 1,
+            'music_disc_number': 1,
+            'artist_name': 'Adele',
+            'album_name': '21',
+            'album_release_year': 2011,
+            'genre': '팝',
+    }
+    # music 데이터 생성
+    with app.test_client() as client:
+        response = client.post(url_for('music.create'),
+                               data=json.dumps(payload),
+                               content_type='application/json')
+    #response 상태
+    assert 201 == response.status_code
+    music = f_session.query(Music)\
+            .filter(Music.name == payload['music_name'])\
+            .first()
+    assert music
+    assert 1 == music.id
+
+    payload2 = {
+            'x': 10,
+            'y': 9,
+            'music_id': 1
+    }
+    # position 데이터 생성
+    with app.test_client() as client:
+        response = client.post(url_for('music.position'),
+                               data=json.dumps(payload2),
+                               content_type='application/json')
+    #response 상태
+    assert 201 == response.status_code
+    # position 생성 확인
+    position = f_session.query(Position)\
+               .filter(Position.music_id == payload2['music_id'])\
+               .first()

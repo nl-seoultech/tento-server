@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from tento.web.app import app
 from tento.db import get_session, Base, get_engine
 from tento.user import User
-from tento.music import Artist, Album, Genre, Music
+from tento.music import Artist, Album, Genre, Music, Position
 
 
 @fixture
@@ -81,3 +81,15 @@ def f_music(f_session, f_genre, f_album):
     f_session.add(music)
     f_session.commit()
     return music
+
+@fixture
+def f_position(f_music):
+    x = 10
+    y = 9
+    music_id = 1
+    position = Position(x=x,
+                        y=y,
+                        music_id=music_id)
+    f_session.add(music)
+    f_session.commit()
+    return position

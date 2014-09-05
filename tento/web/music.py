@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ :mod:`tento.web.music` --- tento의 음악 관련 API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -7,7 +6,7 @@ from flask import Blueprint, jsonify, request, abort
 from sqlalchemy.exc import IntegrityError
 
 from ..db import session
-from ..music import Artist, Album, Music, Genre
+from ..music import Artist, Album, Music, Genre, Position
 
 bp = Blueprint('music', __name__)
 
@@ -71,6 +70,51 @@ def create():
     if g is not None:
         music.genre = g
     session.add(music)
+    # session.commit()으로 데이터를 DB에 생성하고, 예외처리 실행
+    try:
+        session.commit()
+    except IntegrityError as e:
+        session.rollback()
+        abort(500)
+    return '', 201
+
+
+@bp.route('/', methods=['POST'])
+def position():
+    """ 음악 데이터를 받아서 :class:`tento.music.Position`을 생성합니다.
+
+    .. sourcecode:: http
+
+        POST /musics/:id/position/
+        Content-Type: application/json
+        Accept: application/json
+        Host: tento.com
+        
+        {
+            "x": 10,
+            "y": 9,
+            "music_id": 1
+
+    ..sourcecode:: http
+        HTTP/1.1 201 created
+        Content-Type: application/json
+
+    :return: 생성된 :py:class:`tento.music.Position`을 json으로 반환
+    :statuscode 201: 데이터가 정상적으로 생성되었음.
+    :statuscode 400: 필요한 데이터가 비어있음.
+    :statuscode 500: 서버 에러 발생.
+    """
+    if not request.json:
+        abort(400)
+    # json으로 데이터를 받아오는 부분
+    x = request.json.get('x', None)
+    y = request.json.get('y', None)
+    music_id = request.json.get('music_id', None)
+    if music_id is None or x is None or y is None:
+        abort(400)
+    # position 을 생성
+    position = Position(x=x, y=y, music_id=music_id)
+    session.add(position)
     # session.commit()으로 데이터를 DB에 생성하고, 예외처리 실행
     try:
         session.commit()
