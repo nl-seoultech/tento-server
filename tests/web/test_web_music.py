@@ -79,6 +79,15 @@ def test_web_no_json_create_position(f_session, f_music):
     assert 400 == response.status_code
 
 
+def test_web_notfound_create_position(f_session, f_music):
+    payload = {'x': 10, 'y': 9}
+    with app.test_client() as client:
+        response = client.post(url_for('music.position', id_=f_music.id + 1),
+                               data=json.dumps(payload),
+                               content_type='application/json')
+    assert 404 == response.status_code
+
+
 def test_web_create_position(f_session, f_music):
     payload = {'x': 10, 'y': 9}
     # position 데이터 생성

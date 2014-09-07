@@ -89,7 +89,7 @@ def position(id_):
         Content-Type: application/json
         Accept: application/json
         Host: tento.com
-        
+
         {
             "x": 10,
             "y": 9,
@@ -100,6 +100,7 @@ def position(id_):
         HTTP/1.1 201 created
         Content-Type: application/json
 
+    :param id_: :class:`tento.music.Music` 의 :attr:`tento.music.Music.id`
     :return: 생성된 :py:class:`tento.music.Position`을 json으로 반환
     :statuscode 201: 데이터가 정상적으로 생성되었음.
     :statuscode 400: 필요한 데이터가 비어있음.
