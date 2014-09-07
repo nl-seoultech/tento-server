@@ -2,13 +2,24 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-from flask import Blueprint, jsonify, request, abort
+from flask import Blueprint, request, abort
 from sqlalchemy.exc import IntegrityError
 
 from ..db import session
 from ..music import Artist, Album, Music, Genre, Position
+from .util import jsonable, jsonify
 
 bp = Blueprint('music', __name__)
+
+
+@jsonable.register(Position)
+def _(arg):
+    return {
+        'x': arg.x,
+        'y': arg.y,
+        'music_id': arg.music_id
+    }
+
 
 @bp.route('/', methods=['POST'])
 def create():
@@ -76,7 +87,7 @@ def create():
     except IntegrityError as e:
         session.rollback()
         abort(500)
-    return '', 201
+    return jsonify(), 201
 
 
 @bp.route('/<int:id_>/positions/', methods=['POST'])
@@ -127,7 +138,7 @@ def position(id_):
     except IntegrityError as e:
         session.rollback()
         abort(500)
-    return jsonify(), 201
+    return jsonify(position), 201
 
 
 @bp.route('/<int:id_>/positions/', methods=['GET'])
@@ -163,4 +174,50 @@ def find_position(id_):
                .first()
     if not position:
         abort(404)
-    return jsonify(x=position.x, y=position.y, music_id=position.music_id)
+    return jsonify(position)
+
+
+@bp.route('/positions/', methods=['GET'])
+def find_all_positions():
+    """ 모든 :class:`tento.music.Position`을 조회합니다.
+
+    .. sourcecode:: http
+
+        GET /musics/positions/?music_ids=1,2,3,4
+        Accept: application/json
+        Host: tento.com
+
+    ..sourcecode:: http
+        HTTP/1.1 201 created
+        Content-Type: application/json
+        {
+            "positions": [
+                {
+                    "x": 0,
+                    "y": 0,
+                    "music_id": 1
+                },
+                ...
+            ]
+        }
+
+    :query string music_ids: :attr:`tento.music.Music.id` 를 , 로 이어 붙인것.
+    :return: 조회한 :py:class:`tento.music.Position`을 json으로 반환
+    :statuscode 200: 데이터가 정상적으로 조회되었음.
+    :statuscode 400: 쿼리스트링에 이상한 문자열이 들어왔을때,
+                     music_ids가 없을때
+    :statuscode 500: 서버 에러 발생.
+    """
+    music_ids = request.args.get('music_ids', None)
+    if music_ids is None:
+        abort(400)
+    music_ids = music_ids.split(',')
+    try:
+        music_ids = [int(x.strip()) for x in music_ids if x]
+    except ValueError as e:
+        abort(400)
+    positions = session.query(Position)\
+                .join(Position.music)\
+                .filter(Music.id.in_(music_ids))\
+                .all()
+    return jsonify(positions=positions)

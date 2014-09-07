@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from random import randint
+
 from flask import json
 
 from tento.web.app import app
@@ -121,9 +123,59 @@ def test_web_find_position(f_session, f_position):
     assert 200 == response.status_code
     assert response.data
     data = json.loads(response.data)
+    assert data
     assert 'x' in data
     assert 'y' in data
     assert 'music_id' in data
     assert f_position.x == data['x']
     assert f_position.y == data['y']
     assert f_position.music_id == data['music_id']
+
+
+def test_web_noquery_all_pos(f_session, f_position):
+    url = url_for('music.find_all_positions')
+    with app.test_client() as c:
+        r = c.get(url)
+    assert 400 == r.status_code
+
+
+def test_web_weired_query_all_pos(f_session, f_position):
+    url = url_for('music.find_all_positions', music_ids='hehe,weired')
+    with app.test_client() as c:
+        r = c.get(url)
+    assert 400 == r.status_code
+
+
+def test_web_find_all_pos(f_session, f_position, f_album):
+    musics = []
+    for x in range(1, 10):
+        music = Music(name='music {}'.format(x),
+                      album=f_album,
+                      track_number=x,
+                      disc_number=1)
+        f_session.add(music)
+        f_session.add(Position(x=randint(1, 100),
+                               y=randint(1, 100),
+                               music=music))
+        musics.append(music)
+    f_session.commit()
+    url = url_for('music.find_all_positions',
+                  music_ids=','.join([str(x.id) for x in musics]))
+    with app.test_client() as c:
+        r = c.get(url)
+    assert 200 == r.status_code
+    assert r.data
+    data = json.loads(r.data)
+    assert data
+    assert 'positions' in data
+    assert data['positions']
+    expect_ids = [x.id for x in musics]
+    result_ids = [x['music_id'] for x in data['positions']]
+    assert not (set(result_ids) - set(expect_ids))
+    for d in data['positions']:
+        p = f_session.query(Position)\
+            .filter(Position.music_id == d['music_id'])\
+            .first()
+        assert p
+        assert p.x == d['x']
+        assert p.y == d['y']
