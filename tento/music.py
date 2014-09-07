@@ -101,8 +101,10 @@ class Music(Base):
     #: 생성일
     created_at = Column(DateTime, default=datetime.now())
 
+
 class Position(Base):
-    """ 음악 분위기 데이터의 :attr:`x`, `y`, `music_id` 정보를 저장하는 스키마
+    """음악 분위기 데이터의 :attr:`x`, :attr:`y`, :attr:`music_id`
+       정보를 저장하는 스키마
     """
     __tablename__ = 'positions'
 
@@ -117,6 +119,9 @@ class Position(Base):
 
     #: :class:`tento.Music.music_id` 를 가리키는 외래키
     music_id = Column(Integer, ForeignKey('musics.id'), nullable=False)
+
+    #: :class:`tento.Music`
+    music = relationship('Music')
 
     #: 생성일
     created_at = Column(DateTime, default=datetime.now())

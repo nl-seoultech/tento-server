@@ -84,13 +84,10 @@ def f_music(f_session, f_genre, f_album):
 
 
 @fixture
-def f_position(f_music):
+def f_position(f_session, f_music):
     x = 10
     y = 9
-    music_id = 1
-    position = Position(x=x,
-                        y=y,
-                        music_id=music_id)
-    f_session.add(music)
+    position = Position(x=x, y=y, music_id=f_music.id)
+    f_session.add(position)
     f_session.commit()
     return position

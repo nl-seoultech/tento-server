@@ -128,3 +128,39 @@ def position(id_):
         session.rollback()
         abort(500)
     return jsonify(), 201
+
+
+@bp.route('/<int:id_>/positions/', methods=['GET'])
+def find_position(id_):
+    """ :param id_: 에 해당하는 :class:`tento.music.Position`을 조회합니다.
+
+    .. sourcecode:: http
+
+        GET /musics/:id/position/
+        Accept: application/json
+        Host: tento.com
+
+    ..sourcecode:: http
+        HTTP/1.1 201 created
+        Content-Type: application/json
+
+        {
+            "x": 0,
+            "y": 0,
+            "music_id": :id
+        }
+
+    :param id_: :class:`tento.music.Music` 의 :attr:`tento.music.Music.id`
+    :return: 조회한 :py:class:`tento.music.Position`을 json으로 반환
+    :statuscode 200: 데이터가 정상적으로 조회되었음.
+    :statuscode 404: :param id_: 에 해당하는 :class:`tento.music.Position`
+                     데이터가 존재하지않음.
+    :statuscode 500: 서버 에러 발생.
+    """
+    position = session.query(Position)\
+               .join(Position.music)\
+               .filter(Music.id == id_)\
+               .first()
+    if not position:
+        abort(404)
+    return jsonify(x=position.x, y=position.y, music_id=position.music_id)

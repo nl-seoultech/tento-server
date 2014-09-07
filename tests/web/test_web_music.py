@@ -105,3 +105,25 @@ def test_web_create_position(f_session, f_music):
     assert payload['x'] == position.x
     assert payload['y'] == position.y
     assert f_music.id == position.music_id
+
+
+def test_web_notfound_find_position(f_session, f_music):
+    url = url_for('music.find_position', id_=f_music.id + 1)
+    with app.test_client() as client:
+        response = client.get(url)
+    assert 404 == response.status_code
+
+
+def test_web_find_position(f_session, f_position):
+    url = url_for('music.find_position', id_=f_position.music.id)
+    with app.test_client() as client:
+        response = client.get(url)
+    assert 200 == response.status_code
+    assert response.data
+    data = json.loads(response.data)
+    assert 'x' in data
+    assert 'y' in data
+    assert 'music_id' in data
+    assert f_position.x == data['x']
+    assert f_position.y == data['y']
+    assert f_position.music_id == data['music_id']
