@@ -79,8 +79,8 @@ def create():
     return '', 201
 
 
-@bp.route('/', methods=['POST'])
-def position():
+@bp.route('/<int:id_>/positions/', methods=['POST'])
+def position(id_):
     """ 음악 데이터를 받아서 :class:`tento.music.Position`을 생성합니다.
 
     .. sourcecode:: http
@@ -94,6 +94,7 @@ def position():
             "x": 10,
             "y": 9,
             "music_id": 1
+        }
 
     ..sourcecode:: http
         HTTP/1.1 201 created
@@ -109,11 +110,15 @@ def position():
     # json으로 데이터를 받아오는 부분
     x = request.json.get('x', None)
     y = request.json.get('y', None)
-    music_id = request.json.get('music_id', None)
-    if music_id is None or x is None or y is None:
+    if x is None or y is None:
         abort(400)
+    music = session.query(Music)\
+            .filter(Music.id == id_)\
+            .first()
+    if not music:
+        abort(404)
     # position 을 생성
-    position = Position(x=x, y=y, music_id=music_id)
+    position = Position(x=x, y=y, music_id=music.id)
     session.add(position)
     # session.commit()으로 데이터를 DB에 생성하고, 예외처리 실행
     try:
@@ -121,4 +126,4 @@ def position():
     except IntegrityError as e:
         session.rollback()
         abort(500)
-    return '', 201
+    return jsonify(), 201

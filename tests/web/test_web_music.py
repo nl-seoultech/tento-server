@@ -70,51 +70,29 @@ def test_web_create_music(f_session):
     assert genre.id == music.genre.id
 
 
-def test_web_no_json_create_position(f_session):
+def test_web_no_json_create_position(f_session, f_music):
     """ json으로 position(음악의 좌표 데이터)를 생성
     """
     with app.test_client() as client:
-        response = client.post(url_for('music.position'),
+        response = client.post(url_for('music.position', id_=f_music.id),
                                content_type='application/json')
     assert 400 == response.status_code
 
 
-def test_web_create_position(f_session):
-    payload = {
-            'music_name': 'Someone Like You',
-            'music_track_number': 1,
-            'music_disc_number': 1,
-            'artist_name': 'Adele',
-            'album_name': '21',
-            'album_release_year': 2011,
-            'genre': '팝',
-    }
-    # music 데이터 생성
-    with app.test_client() as client:
-        response = client.post(url_for('music.create'),
-                               data=json.dumps(payload),
-                               content_type='application/json')
-    #response 상태
-    assert 201 == response.status_code
-    music = f_session.query(Music)\
-            .filter(Music.name == payload['music_name'])\
-            .first()
-    assert music
-    assert 1 == music.id
-
-    payload2 = {
-            'x': 10,
-            'y': 9,
-            'music_id': 1
-    }
+def test_web_create_position(f_session, f_music):
+    payload = {'x': 10, 'y': 9}
     # position 데이터 생성
     with app.test_client() as client:
-        response = client.post(url_for('music.position'),
-                               data=json.dumps(payload2),
+        response = client.post(url_for('music.position', id_=f_music.id),
+                               data=json.dumps(payload),
                                content_type='application/json')
     #response 상태
     assert 201 == response.status_code
     # position 생성 확인
     position = f_session.query(Position)\
-               .filter(Position.music_id == payload2['music_id'])\
+               .filter(Position.music_id == f_music.id)\
                .first()
+    assert position
+    assert payload['x'] == position.x
+    assert payload['y'] == position.y
+    assert f_music.id == position.music_id

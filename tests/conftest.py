@@ -82,6 +82,7 @@ def f_music(f_session, f_genre, f_album):
     f_session.commit()
     return music
 
+
 @fixture
 def f_position(f_music):
     x = 10
