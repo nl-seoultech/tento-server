@@ -21,6 +21,14 @@ def _(arg):
     }
 
 
+@jsonable.register(Music)
+def _(arg):
+    return {
+        'name': arg.name,
+        'id': arg.id
+    }
+
+
 @bp.route('/', methods=['POST'])
 def create():
     """ 음악 데이터를 받아서 :class:`tento.music.Artist`,
@@ -41,6 +49,7 @@ def create():
          "album_name": "유감",
          "album_release_year": 2010,
          "genre": "팝 > 팝, 팝 > 발라드"
+       }
 
 
     .. sourcecode:: http
@@ -88,6 +97,113 @@ def create():
         session.rollback()
         abort(500)
     return jsonify(), 201
+
+
+@bp.route('/chunk/', methods=['POST'])
+def create_chunks():
+    """ 여러 음악 데이터를 받아서 :class:`tento.music.Artist`,
+    :class:`tento.music.Album`, :class:`tento.music.Music` 을 생성합니다.
+
+    .. sourcecode:: http
+
+       POST /musics/chunk/ HTTP/1.1
+       Content-Type: application/json
+       Accept: application/json
+       Host: tento.com
+
+       {
+           'musics': [
+               {
+                   "music_name": "유감",
+                   "music_track_number": 1,
+                   "music_disc_number": 1,
+                   "artist_name": "leeSA",
+                   "album_name": "유감",
+                   "album_release_year": 2010,
+                   "genre": "팝 > 팝, 팝 > 발라드"
+               },
+               ...
+           ]
+       }
+
+
+    .. sourcecode:: http
+
+       HTTP/1.1 201 created
+       Content-Type: application/json
+
+       {
+           'musics': [
+               {'id': 1, 'name': '유감'},
+               ...
+           ]
+       }
+
+    :return: 생성된 :py:class:`tento.music.Artist` , :class:`tento.music.Album` ,
+             :py:class:`tento.music.Music` 를 json으로 반환.
+    :statuscode 201: 데이터가 정상적으로 생성됬음.
+    :statuscode 400: 필요한 데이터가 비어있음.
+    :statuscode 500: 서버 에러발생
+    """
+    r = []
+    if not request.json:
+        abort(400)
+    musics = request.json.get('musics', None)
+    if not musics:
+        abort(400)
+    for music in musics:
+        music_name = music.get('music_name', None)
+        music_track_number = music.get('music_track_number', None)
+        music_disc_number = music.get('music_disc_number', None)
+        artist_name = music.get('artist_name', None)
+        album_name = music.get('album_name', None)
+        album_release_year = music.get('album_release_year', None)
+        genre = music.get('genre', None)
+        lyrics = music.get('lyrics', None)
+        if artist_name is None or music_name is None or album_name is None:
+            continue
+        artist = session.query(Artist)\
+                 .filter(Artist.name == artist_name)\
+                 .first()
+        if not artist:
+            artist = Artist(name=artist_name)
+            session.add(artist)
+        album = session.query(Album)\
+                .join(Album.artist)\
+                .filter(Album.name == album_name)\
+                .filter(Album.artist_id == artist.id)\
+                .first()
+        if not album:
+            album = Album(artist=artist,
+                          name=album_name,
+                          year=album_release_year)
+            session.add(album)
+        g = session.query(Genre)\
+            .filter(Genre.name == genre)\
+            .first()
+        if not g and genre is not None:
+            g = Genre(name=genre)
+            session.add(g)
+        music = session.query(Music)\
+                .join(Music.album)\
+                .filter(Music.name == music_name)\
+                .filter(Music.album_id == album.id)\
+                .first()
+        if not music:
+            music = Music(album=album, name=music_name,
+                          track_number=music_track_number,
+                          disc_number=music_disc_number)
+            if g is not None:
+                music.genre = g
+            session.add(music)
+            r.append(music)
+        try:
+            session.commit()
+        except IntegrityError as e:
+            session.rollback()
+            print(e)
+            abort(500)
+    return jsonify(musics=r), 201
 
 
 @bp.route('/<int:id_>/positions/', methods=['POST'])
@@ -147,19 +263,20 @@ def find_position(id_):
 
     .. sourcecode:: http
 
-        GET /musics/:id/position/
-        Accept: application/json
-        Host: tento.com
+       GET /musics/:id/position/
+       Accept: application/json
+       Host: tento.com
 
-    ..sourcecode:: http
-        HTTP/1.1 201 created
-        Content-Type: application/json
+    .. sourcecode:: http
 
-        {
-            "x": 0,
-            "y": 0,
-            "music_id": :id
-        }
+       HTTP/1.1 201 created
+       Content-Type: application/json
+
+       {
+           "x": 0,
+           "y": 0,
+           "music_id": :id
+       }
 
     :param id_: :class:`tento.music.Music` 의 :attr:`tento.music.Music.id`
     :return: 조회한 :py:class:`tento.music.Position`을 json으로 반환
@@ -183,23 +300,24 @@ def find_all_positions():
 
     .. sourcecode:: http
 
-        GET /musics/positions/?music_ids=1,2,3,4
-        Accept: application/json
-        Host: tento.com
+       GET /musics/positions/?music_ids=1,2,3,4
+       Accept: application/json
+       Host: tento.com
 
-    ..sourcecode:: http
-        HTTP/1.1 201 created
-        Content-Type: application/json
-        {
-            "positions": [
-                {
-                    "x": 0,
-                    "y": 0,
-                    "music_id": 1
-                },
-                ...
-            ]
-        }
+    .. sourcecode:: http
+
+       HTTP/1.1 201 created
+       Content-Type: application/json
+       {
+           "positions": [
+               {
+                   "x": 0,
+                   "y": 0,
+                   "music_id": 1
+               },
+               ...
+           ]
+       }
 
     :query string music_ids: :attr:`tento.music.Music.id` 를 , 로 이어 붙인것.
     :return: 조회한 :py:class:`tento.music.Position`을 json으로 반환

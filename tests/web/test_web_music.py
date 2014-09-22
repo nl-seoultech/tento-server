@@ -72,6 +72,94 @@ def test_web_create_music(f_session):
     assert genre.id == music.genre.id
 
 
+def test_web_create_chunk_music(f_session):
+    payload = {
+        'musics': [
+            {
+                'music_name': '유감',
+                'music_track_number': 1,
+                'music_disc_number': 1,
+                'artist_name': 'leeSA',
+                'album_name': '유감',
+                'album_release_year': 2010,
+                'genre': '팝 > 팝, 팝 > 발라드'
+            },
+            {
+                'music_name': '유감',
+                'music_track_number': 1,
+                'music_disc_number': 1,
+                'artist_name': 'leeSA',
+                'album_name': '유감',
+                'album_release_year': 2010,
+                'genre': '팝 > 팝, 팝 > 발라드'
+            },
+            {
+                'music_name': 'Could you stop that smile ?',
+                'music_track_number': 1,
+                'music_disc_number': 1,
+                'artist_name': 'leeSA',
+                'album_name': '유감',
+                'album_release_year': 2010,
+                'genre': '팝 > 팝, 팝 > 발라드'
+            },
+        ]
+    }
+    with app.test_client() as client:
+        response = client.post(url_for('music.create_chunks'),
+                               data=json.dumps(payload),
+                               content_type='application/json')
+    # response 상태
+    assert 201 == response.status_code
+    # artist 데이터 생성 확인
+    artist = f_session.query(Artist)\
+             .filter(Artist.name == payload['musics'][0]['artist_name'])\
+             .first()
+    assert artist
+    assert artist.name
+    assert artist.created_at
+    assert payload['musics'][0]['artist_name'] == artist.name
+    print([x.name for x in f_session.query(Artist).all()])
+    assert 1 == f_session.query(Artist).count()
+    # album 데이터 생성 확인
+    album = f_session.query(Album)\
+            .filter(Album.name == payload['musics'][0]['album_name'])\
+            .first()
+    assert album
+    assert album.name
+    assert album.created_at
+    assert album.year
+    assert album.artist_id
+    assert artist.id == album.artist.id
+    assert 1 == f_session.query(Album).count()
+    # genre 데이터 생성 확인
+    genre = f_session.query(Genre)\
+            .filter(Genre.name == payload['musics'][0]['genre'])\
+            .first()
+    assert genre
+    assert genre.name
+    assert genre.created_at
+    assert 1 == f_session.query(Genre).count()
+    # music 데이터 생성 확인
+    for v in payload['musics']:
+        music = f_session.query(Music)\
+                .filter(Music.name == v['music_name'])\
+                .first()
+        assert music
+        assert music.name == v['music_name']
+        assert music.created_at
+        assert music.album_id
+        assert album.id == music.album.id
+        assert music.genre_id
+        assert genre.id == music.genre.id
+    assert 2 == f_session.query(Music).count()
+    assert response.data
+    data = json.loads(response.data)
+    assert 'musics' in data
+    assert data['musics']
+    exp = [{'id': x.id, 'name': x.name} for x in f_session.query(Music).all()]
+    assert exp == data['musics']
+
+
 def test_web_no_json_create_position(f_session, f_music):
     """ json으로 position(음악의 좌표 데이터)를 생성
     """
