@@ -8,3 +8,4 @@
       tento/user
       tento/music
       tento/web
+      tento/crawler
